@@ -1,5 +1,5 @@
 DATASET_PATH = "../../project/"
-
+NUM_NODES = 22
 CURR_MODEL = "RNN"
 
 params = {
