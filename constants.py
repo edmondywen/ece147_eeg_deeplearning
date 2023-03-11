@@ -4,8 +4,8 @@ CURR_MODEL = "CNN_LSTM"
 
 params = {
     "RNN" : {
-        "EPOCHS" : 100, 
-        "BATCH_SIZE": 32, 
+        "EPOCHS" : 500, 
+        "BATCH_SIZE": 128, 
         "N_EVAL": 10 
     }, 
     "TRN": {
