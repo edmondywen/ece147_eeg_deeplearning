@@ -9,12 +9,12 @@ class RNN(torch.nn.Module):
         n_layers=10,
     ):
         
-        input_size=1000
+        input_size=250
         hidden_size=128
         num_classes = 4
 
         super(RNN, self).__init__()
-        self.n_layers = 10
+        self.n_layers = 1
         self.hidden_size = hidden_size
         self.batch_size = batch_size
         

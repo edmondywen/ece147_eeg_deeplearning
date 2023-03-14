@@ -27,6 +27,7 @@ def main():
     network_class = import_module("networks." + constants.CURR_MODEL).__getattribute__(constants.CURR_MODEL)
     model = network_class(batch_size)
     model = model.float()
+    # print("MODEL TYPE: ", model.dtype)
 
     summary(model, input_size=(22, 250))
 

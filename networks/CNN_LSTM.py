@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import constants
 
-class RNN(torch.nn.Module):
+class CNN_LSTM(torch.nn.Module):
     def __init__(
         self,
         batch_size,
@@ -12,7 +12,7 @@ class RNN(torch.nn.Module):
         hidden_size= 8
         num_classes = 4
 
-        super(RNN, self).__init__()
+        super(CNN_LSTM, self).__init__()
         self.n_layers = n_layers
         self.hidden_size = hidden_size
         self.batch_size = batch_size
@@ -42,10 +42,13 @@ class RNN(torch.nn.Module):
     
     def forward(self, inputs):
         # Avoid breaking if the last batch has a different size
+        # print("input type: ", inputs.dtype)
+
         batch_size = inputs.size(0)
         if batch_size != self.batch_size:
             self.batch_size = batch_size
        
+        inputs = inputs.float()
         x = self.dropout(self.maxpool(self.conv1(inputs)))
         x = self.dropout(self.maxpool(self.conv2(x)))
         x = self.dropout(self.maxpool(self.conv3(x)))

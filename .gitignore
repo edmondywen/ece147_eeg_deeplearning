@@ -3,3 +3,4 @@ project_data/
 **/.DS_Store
 *.zip
 __pycache__
+runs/
