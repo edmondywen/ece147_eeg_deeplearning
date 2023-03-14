@@ -22,7 +22,7 @@ class RNN(torch.nn.Module):
         self.conv2 = nn.Conv1d(in_channels=128, out_channels=192, kernel_size=5)
         self.conv3 = nn.Conv1d(in_channels=192, out_channels=128, kernel_size=5)
         self.dropout = nn.Dropout(0.5)
-        self.batchnorm1 = nn.BatchNorm1d(num_features=)
+        
         self.rnn = nn.GRU(
             27,
             hidden_size,
@@ -46,9 +46,6 @@ class RNN(torch.nn.Module):
         if batch_size != self.batch_size:
             self.batch_size = batch_size
        
-        inputs = inputs.to(torch.float32)
-        print(self.conv1(inputs).size)
-        exit()
         x = self.dropout(self.maxpool(self.conv1(inputs)))
         x = self.dropout(self.maxpool(self.conv2(x)))
         x = self.dropout(self.maxpool(self.conv3(x)))
