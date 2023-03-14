@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-
+from torch.utils.tensorboard import SummaryWriter
 global device 
 device = torch.device('cpu') 
 
@@ -34,10 +34,10 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
     )
 
     # Initalize optimizer (for gradient descent) and loss function
-    optimizer = optim.Adam(model.parameters())
+    optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-3)
     loss_fn = nn.CrossEntropyLoss()
 
-
+    writer = SummaryWriter()
     model = model.to(device)
 
     # Initialize summary writer (for logging)
@@ -79,18 +79,22 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
                 train_accuracy = compute_accuracy(pred, label_data)
                 print(f"    Train Accu: {train_accuracy}")
 
-                # # Log the results to Tensorboard
-                # if tb_summary:
-                #     tb_summary.add_scalar('Loss (Training)', loss, epoch)
-                #     tb_summary.add_scalar('Accuracy (Training)', train_accuracy, epoch)
+
+
 
                 # Compute validation loss and accuracy.
                 valid_loss, valid_accuracy = evaluate(val_loader, model, loss_fn)
 
                 # # Log the results to Tensorboard.
-                # if tb_summary:
-                #     tb_summary.add_scalar('Loss (Validation)', valid_loss, epoch)
-                #     tb_summary.add_scalar('Accuracy (Validation)', valid_accuracy, epoch)
+                if writer:
+                    writer.add_scalars('losses', {
+                        'Validation' : valid_loss,
+                        'Train': loss},
+                        epoch)
+                    writer.add_scalars('Accuracy',{
+                        'Validation' : valid_accuracy,
+                        'Train' : train_accuracy},
+                        epoch)
 
                 print(f"    Valid Loss: {valid_loss}")
                 print(f"    Valid Accu: {valid_accuracy}")
