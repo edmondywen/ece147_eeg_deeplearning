@@ -4,6 +4,7 @@ import constants
 from data.StartingDataset import StartingDataset
 from train_functions.starting_train import starting_train
 from importlib import import_module
+from torchsummary import summary
 
 # TODO: make a conda env to run everything 
 
@@ -18,13 +19,16 @@ def main():
     print(f"Epochs: {epochs}\n Batch size: {batch_size}")
 
     # Initalize dataset 
-    train_dataset = StartingDataset("train")
     val_dataset = StartingDataset("val")
+    train_dataset = StartingDataset("train", v_index=val_dataset.val_indices)
+    
 
     # Initialize model 
     network_class = import_module("networks." + constants.CURR_MODEL).__getattribute__(constants.CURR_MODEL)
     model = network_class(batch_size)
     model = model.float()
+
+    summary(model, input_size=(22, 250))
 
     starting_train(
         train_dataset=train_dataset,
