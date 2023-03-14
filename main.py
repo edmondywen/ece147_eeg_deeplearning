@@ -37,6 +37,7 @@ def main(curr_model):
         model=model,
         hyperparameters=hyperparameters,
         n_eval=n_eval,
+        curr_model_type=curr_model
     )
 
 

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
+import os
 global device 
 device = torch.device('cpu') 
 
@@ -10,7 +11,7 @@ if torch.cuda.is_available():
     device = torch.device('cuda:0')
 
 
-def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
+def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval, curr_model_type):
     """
     Trains and evaluates a model.
 
@@ -20,6 +21,7 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
         model:           PyTorch model to be trained.
         hyperparameters: Dictionary containing hyperparameters.
         n_eval:          Interval at which we evaluate our model.
+        curr_model_type: String of our model type 
     """
 
     # Get keyword arguments
@@ -28,7 +30,7 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
     # Initialize dataloaders
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True
-    )
+    ) 
     val_loader = torch.utils.data.DataLoader(
         val_dataset, batch_size=batch_size, shuffle=True
     )
@@ -38,6 +40,9 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
     loss_fn = nn.CrossEntropyLoss()
 
     writer = SummaryWriter()
+    # append the model type inside runs to the writing path
+    writing_path = f"runs/{curr_model_type}/{writer.log_dir.split('/')[1]}"
+    writer = SummaryWriter(writing_path)
     model = model.to(device)
 
     # Initialize summary writer (for logging)
@@ -45,6 +50,7 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
     # tb_summary = None
     # if summary_path is not None:
     #     tb_summary = torch.utils.tensorboard.SummaryWriter(summary_path)
+    best_valid_acc = -1
 
 
     step = 0
@@ -84,6 +90,14 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
 
                 # Compute validation loss and accuracy.
                 valid_loss, valid_accuracy = evaluate(val_loader, model, loss_fn)
+                if valid_accuracy > best_valid_acc:
+                    print(f"Best validation accuracy of {valid_accuracy} found!")
+                    best_valid_acc = valid_accuracy
+                    print("Saving the model!")
+                    cwd = os.getcwd()
+                    save_path = f"{writing_path}/best_model.pt"
+                    torch.save(model.state_dict(),save_path)
+                
 
                 # # Log the results to Tensorboard.
                 if writer:
@@ -104,6 +118,12 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
             step += 1
 
         print()
+    print("Saving final model")
+    save_path = f"{writing_path}/final_model.pt"
+    torch.save(model.state_dict(),save_path)
+
+
+    
 
 
 def compute_accuracy(outputs, labels):
