@@ -1,5 +1,5 @@
 *.ipynb
 project_data/
-.DS_Store
+**/.DS_Store
 *.zip
 __pycache__
