@@ -1,5 +1,6 @@
 DATASET_PATH = "../../project/"
 NUM_NODES = 22
+TEST_BATCH_SIZE = 32
 
 params = {
     "RNN" : {

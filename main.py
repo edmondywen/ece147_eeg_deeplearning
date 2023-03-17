@@ -42,8 +42,12 @@ def main(curr_model):
 
 
 if __name__ == "__main__":
+    # Arg Parsing
     parser = argparse.ArgumentParser()
     parser.add_argument('model', type=str)
+    # parser.add_argument('-t', '--test', action='store_true')
     args = parser.parse_args()
     curr_model= args.model
+    # is_test = args.test
+
     main(curr_model)

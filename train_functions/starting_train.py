@@ -85,9 +85,6 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval, c
                 train_accuracy = compute_accuracy(pred, label_data)
                 print(f"    Train Accu: {train_accuracy}")
 
-
-
-
                 # Compute validation loss and accuracy.
                 valid_loss, valid_accuracy = evaluate(val_loader, model, loss_fn)
                 if valid_accuracy > best_valid_acc:
@@ -96,8 +93,7 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval, c
                     print("Saving the model!")
                     cwd = os.getcwd()
                     save_path = f"{writing_path}/best_model.pt"
-                    torch.save(model.state_dict(),save_path)
-                
+                    torch.save(model, save_path) # save entire model instead of just the state dict to make test loading easier
 
                 # # Log the results to Tensorboard.
                 if writer:
@@ -120,11 +116,7 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval, c
         print()
     print("Saving final model")
     save_path = f"{writing_path}/final_model.pt"
-    torch.save(model.state_dict(),save_path)
-
-
-    
-
+    torch.save(model,save_path)
 
 def compute_accuracy(outputs, labels):
     """
@@ -166,3 +158,4 @@ def evaluate(val_loader, model, loss_fn):
             count += len(label_data)
 
     return loss, correct/count
+
