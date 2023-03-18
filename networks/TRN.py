@@ -27,7 +27,6 @@ class PositionalEncoding(nn.Module):
         dropout = 0.1
 
         self.dropout = nn.Dropout(p=dropout)
-
         pe = torch.zeros(vocab_cnt, d_model)
         position = torch.arange(0, vocab_cnt, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
@@ -46,55 +45,42 @@ class PositionalEncoding(nn.Module):
         Examples:
             >>> output = pos_encoder(x)
         """
-
+        
+        print(x.size)
         x = x + self.pe[:x.size(0), :]
-        return self.dropout(x)
+        return self.dropout(x) # why is there dropout here 
 
 class TRN(torch.nn.Module):
     """
     Neural Net with TRN
     """
 
-    def __init__(self, batch_size, n_layers=10):
+    def __init__(self, batch_size, n_layers=2):
         super(TRN,self).__init__()
         num_classes = 4
-        self.d_model = 22 * 250
-        # self.transformer = nn.Transformer(nhead=16, num_encoder_layers=12, num_decoder_layers=12, batch_first=True)
+        self.batch_size = batch_size
+        self.d_model = 22 #embedding size
+        total_timesteps = 250
 
-       # self.flatten = nn.Flatten()
         self.positional_encoder = PositionalEncoding(d_model=self.d_model)
-        
-        encoder_layers = nn.TransformerEncoderLayer(d_model=self.d_model, nhead=22 )
-
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layers, num_layers=12)
-
-        self.encoder = nn.Embedding(num_classes,self.d_model)
-        self.decoder = nn.Linear(self.d_model,num_classes)
-        self.init_weights()
-        # self.sigmoid = nn.Sigmoid()
-        
-    def init_weights(self) -> None:
-        initrange = 0.1
-        self.encoder.weight.data.uniform_(-initrange, initrange)
-        self.decoder.bias.data.zero_()
-        self.decoder.weight.data.uniform_(-initrange, initrange)
+        self.encoder_layer = nn.TransformerEncoderLayer(d_model=self.d_model, nhead=1, dropout=0.5)
+        self.encoder = nn.TransformerEncoder(encoder_layer=self.encoder_layer, num_layers=n_layers) # https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html 
+        self.decoder = nn.Linear(self.d_model * total_timesteps, num_classes)
 
     def forward(self, x):
-        # src = self.encoder(src)
-        # src = self.positional_encoder(src)
+        # x = x.reshape(-1,1)
+        # x = self.positional_encoder(x)
 
-        # output = self.transformer_encoder(src, src_mask)
-        # output = self.decoder(output)
-        # return output
-        print("x type",type(x))
-        x = self.encoder(x.long()) * math.sqrt(self.d_model)
-        x = self.positional_encoder(x)
-        x = self.transformer_encoder(x)
-        x= x.mean(dim=1)
+        # Avoid breaking if the last batch has a different size
+        batch_size = x.size(0)
+        if batch_size != self.batch_size:
+            self.batch_size = batch_size
+
+        x = x.reshape(self.batch_size, x.size(2), x.size(1))
+        x = self.encoder(x.float()) #* math.sqrt(self.d_model))
+        x = x.reshape(self.batch_size, -1)
         x = self.decoder(x)
         return x
-    
-
     
     def generate_square_subsequent_mask(sz):
         """

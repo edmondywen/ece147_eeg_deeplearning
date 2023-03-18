@@ -29,7 +29,7 @@ def main(curr_model):
     model = model.float()
     # print("MODEL TYPE: ", model.dtype)
 
-    summary(model, input_size=(22, 250))
+    # summary(model, input_size=(22, 250))
 
     starting_train(
         train_dataset=train_dataset,
