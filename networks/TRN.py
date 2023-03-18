@@ -22,14 +22,14 @@ class PositionalEncoding(nn.Module):
     """
 
     # what is max_len?
-    def __init__(self, max_len=5000,d_model=224*224*3):
+    def __init__(self, vocab_cnt=3048,d_model=22 * 250):
         super(PositionalEncoding, self).__init__()
         dropout = 0.1
 
         self.dropout = nn.Dropout(p=dropout)
 
-        pe = torch.zeros(max_len, d_model)
-        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        pe = torch.zeros(vocab_cnt, d_model)
+        position = torch.arange(0, vocab_cnt, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
@@ -58,13 +58,13 @@ class TRN(torch.nn.Module):
     def __init__(self, batch_size, n_layers=10):
         super(TRN,self).__init__()
         num_classes = 4
-        self.d_model = 224 * 224 * 3
+        self.d_model = 22 * 250
         # self.transformer = nn.Transformer(nhead=16, num_encoder_layers=12, num_decoder_layers=12, batch_first=True)
 
        # self.flatten = nn.Flatten()
         self.positional_encoder = PositionalEncoding(d_model=self.d_model)
         
-        encoder_layers = nn.TransformerEncoderLayer(d_model=self.d_model, nhead=16 )
+        encoder_layers = nn.TransformerEncoderLayer(d_model=self.d_model, nhead=22 )
 
         self.transformer_encoder = nn.TransformerEncoder(encoder_layers, num_layers=12)
 
@@ -72,6 +72,7 @@ class TRN(torch.nn.Module):
         self.decoder = nn.Linear(self.d_model,num_classes)
         self.init_weights()
         # self.sigmoid = nn.Sigmoid()
+        
     def init_weights(self) -> None:
         initrange = 0.1
         self.encoder.weight.data.uniform_(-initrange, initrange)
@@ -85,7 +86,8 @@ class TRN(torch.nn.Module):
         # output = self.transformer_encoder(src, src_mask)
         # output = self.decoder(output)
         # return output
-        x = self.encoder(x) * math.sqrt(self.d_model)
+        print("x type",type(x))
+        x = self.encoder(x.long()) * math.sqrt(self.d_model)
         x = self.positional_encoder(x)
         x = self.transformer_encoder(x)
         x= x.mean(dim=1)
