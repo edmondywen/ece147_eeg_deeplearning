@@ -1,6 +1,7 @@
 import math
 import torch
 import torch.nn as nn
+import scipy.stats
 
 
 # grabbed the cosine and sin similarity formulas from paper
@@ -22,7 +23,7 @@ class PositionalEncoding(nn.Module):
     """
 
     # what is max_len?
-    def __init__(self, vocab_cnt=3048,d_model=22 * 250):
+    def __init__(self, vocab_cnt=3048,d_model=22 * 25):
         super(PositionalEncoding, self).__init__()
         dropout = 0.1
 
@@ -45,9 +46,11 @@ class PositionalEncoding(nn.Module):
         Examples:
             >>> output = pos_encoder(x)
         """
-        
-        print(x.size)
-        x = x + self.pe[:x.size(0), :]
+        # 176000 67056
+        print("x size",x.size())
+        dropout_term = self.pe[:, : x.size(1), :]
+        print("dropout_term size", dropout_term.size())
+        x = x + self.pe[:, : x.size(1), :]
         return self.dropout(x) # why is there dropout here 
 
 class TRN(torch.nn.Module):
@@ -59,25 +62,32 @@ class TRN(torch.nn.Module):
         super(TRN,self).__init__()
         num_classes = 4
         self.batch_size = batch_size
-        self.d_model = 22 #embedding size
-        total_timesteps = 250
+        self.d_model = 22 
+        total_timesteps = 25
 
         self.positional_encoder = PositionalEncoding(d_model=self.d_model)
-        self.encoder_layer = nn.TransformerEncoderLayer(d_model=self.d_model, nhead=1, dropout=0.5)
+        self.encoder_layer = nn.TransformerEncoderLayer(d_model=self.d_model, nhead=11, dropout=0.5)
         self.encoder = nn.TransformerEncoder(encoder_layer=self.encoder_layer, num_layers=n_layers) # https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html 
         self.decoder = nn.Linear(self.d_model * total_timesteps, num_classes)
 
     def forward(self, x):
         # x = x.reshape(-1,1)
-        # x = self.positional_encoder(x)
-
         # Avoid breaking if the last batch has a different size
         batch_size = x.size(0)
         if batch_size != self.batch_size:
             self.batch_size = batch_size
+       # x = self.positional_encoder(x)
+       # binning of data from 250 to 25
+        # print("x shape", x.size())
+        # 32 * 22 * 250
+        # print("x shape", x.size())
+
+        avgpool = torch.nn.AvgPool1d(10)
+        x = avgpool(x)
 
         x = x.reshape(self.batch_size, x.size(2), x.size(1))
-        x = self.encoder(x.float()) #* math.sqrt(self.d_model))
+        # normalize dadta
+        x = self.encoder(x.float()) # * math.sqrt(self.d_model)
         x = x.reshape(self.batch_size, -1)
         x = self.decoder(x)
         return x
