@@ -110,13 +110,15 @@ class TRN(torch.nn.Module):
         # print("x shape", x.size())
         # 32 * 22 * 250
         # print("x shape", x.size())
-
+        # 250 / 10 = 25
         avgpool = torch.nn.AvgPool1d(10)
         x = avgpool(x)
 
         # x is now the embeddings
 
         # encodings = self.positional_encoder(x)
+        # print(encodings)
+        # print(x)
         # # print("encodings shape", encodings.size())
         # # print(" x shape", x.size())
         # TODO: does this help!
