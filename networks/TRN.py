@@ -113,19 +113,10 @@ class TRN(torch.nn.Module):
         # 250 / 10 = 25
         avgpool = torch.nn.AvgPool1d(10)
         x = avgpool(x)
-
-        # x is now the embeddings
-
-        # encodings = self.positional_encoder(x)
-        # print(encodings)
-        # print(x)
-        # # print("encodings shape", encodings.size())
-        # # print(" x shape", x.size())
-        # TODO: does this help!
         x = x + self.positional_encoder(x)
 
         x = x.reshape(self.batch_size, x.size(2), x.size(1))
-        # normalize dadta
+        # normalize data
         x = self.encoder(x.float()) # * math.sqrt(self.d_model)
         x = x.reshape(self.batch_size, -1)
         x = self.decoder(x)

@@ -5,7 +5,7 @@ from data.StartingDataset import StartingDataset
 from data.PersonDataset import PersonDataset
 from train_functions.starting_train import starting_train
 from importlib import import_module
-from torchsummary import summary
+from torchinfo import summary
 
 # TODO: make a conda env to run everything 
 
@@ -33,7 +33,7 @@ def main(args):
     model = network_class(batch_size)
     model = model.float()
 
-    # summary(model, input_size=(22, 250))
+    summary(model, input_size=(32, 22, 250))
 
     starting_train(
         train_dataset=train_dataset,

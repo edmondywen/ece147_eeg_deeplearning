@@ -63,7 +63,6 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval, c
             input_data, label_data = batch
             input_data = input_data.to(device)
             label_data = label_data.to(device)
-            
             pred = model(input_data)
 
             # Prediction, label data have same shape
