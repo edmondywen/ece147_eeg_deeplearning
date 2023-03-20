@@ -1,23 +1,24 @@
 # EEG Project
 
-## Running the Skeleton Code
+## Running the Code Locally
 
-### Running the Code Locally
-
-After activating your conda environment, run the following command:
+###After activating your conda environment, run the following command:
 
 ```
 python main.py <model name>
 ```
+Valid model names can be found as the keys for the params dictionary in constants.py. 
 
-To run on test code, run the following command instead: 
+###To run on test code, run the following command instead:
 ```
-python main.py <model name> -t
+python test.py <path to model weights>
 ```
 
-### Running the Code on Google Colab
+###To run on test code which isolates an experimental subject, run the following command instead:
+```
+python test_person.py <path to model weights>
+```
 
-[This notebook](https://colab.research.google.com/drive/1zkxwgDItHv92iD07M8o8FlfJ0ZxLUDly?usp=sharing) will walk you through setting the skeleton code up on Google Colab.
+When training, model runs will be saved to /runs/model_name
 
-**Note:** Google Colab may terminate your session after a few hours, so it may be a better idea to run your code on Kaggle (see below).
 
