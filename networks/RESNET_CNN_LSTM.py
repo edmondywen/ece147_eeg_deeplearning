@@ -20,7 +20,7 @@ class CNN_LSTM(torch.nn.Module):
         self.batch_size = batch_size
         
         # initialize resnet for transfer learning
-        self.resnet18 = models.resnet18(pretrained=True) # i don't think this will work because resnet uses 2d convolutions and I don't want to implement a 1d resnet
+        self.resnet18 = models.resnet18(pretrained=False) # i don't think this will work because resnet uses 2d convolutions and I don't want to implement a 1d resnet
         self.resnet18 = nn.Sequential(*list(self.resnet18.modules())[:-1])
 
         # init remaining layers 
